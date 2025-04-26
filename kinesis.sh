@@ -262,6 +262,7 @@ check_text_exists "/etc/ssh/sshd_config" "Port 22" "SSH runs on port 22" "4"
 check_text_exists "/etc/ssh/sshd_config" "AddressFamily inet" "SSH connections only use the IPv4 address family" "4"
 check_text_exists "/etc/ssh/sshd_config" "PermitRootLogin no" "SSH doesn't permit root login" "4"
 check_text_exists2 "/etc/ssh/sshd_config" "PasswordAuthentication no" "PubkeyAuthentication yes" "SSH uses key based authentication" "4"
+check_text_exists "/etc/ssh/sshd_config" "AuthorizedKeysCommandUser nobody" "No Authorized Key Command User" "4"
 
 # keep this line at the end, input the path to score report html here
 # accepts two args: path to template html file, and path to actual html file
