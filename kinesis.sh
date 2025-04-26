@@ -258,6 +258,8 @@ check_packages3() {
 # accepts two args: image name, and injects bool (true/false)
 _header "Class of 25" "false"
 
+check_text_not_exists "/etc/group" "koco:x:1010:" "Unauthorized user koco removed" "4"
+check_text_not_exists "/etc/group" "lt:x:1011:koco," "koco is not part of the LT group" "4"
 check_text_exists "/etc/ssh/sshd_config" "Port 22" "SSH runs on port 22" "4"
 check_text_exists "/etc/ssh/sshd_config" "AddressFamily inet" "SSH connections only use the IPv4 address family" "4"
 check_text_exists "/etc/ssh/sshd_config" "PermitRootLogin no" "SSH doesn't permit root login" "4"
