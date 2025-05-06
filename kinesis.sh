@@ -295,6 +295,7 @@ check_text_exists "/home/dallas/Desktop/Forensics1.txt" "iot-city" "Forensics 1 
 check_text_exists "/home/dallas/Desktop/Forensics2.txt" "https://tophermitchell.hair" "Forensics 2 correct" "4"
 check_text_not_exists "/etc/group" "koco:x:1010:" "Unauthorized user koco removed" "4"
 check_text_not_exists "/etc/group" "lt:x:1011:koco," "koco is not part of the LT group" "4"
+check_text_not_exists "/etc/group" "root:x:0:lt" "lt should not have root access" "4"
 check_text_exists "/etc/ssh/sshd_config" "Port 22" "SSH runs on port 22" "4"
 check_text_exists "/etc/ssh/sshd_config" "AddressFamily inet" "SSH connections only use the IPv4 address family" "4"
 check_text_exists "/etc/ssh/sshd_config" "PermitRootLogin no" "SSH doesn't permit root login" "4"
@@ -315,7 +316,6 @@ check_packages "nginx" "nginx removed" "4"
 check_packages "hydra" "hydra removed" "4"
 check_file_permissions "/etc/shadow" "600" "shadow file permissions fixed" "4"
 check_text_not_exists "/var/spool/cron/crontabs/spencer" "* * * * * apt install hydra" "malicious crontab removed" "4"
-check_text_not_exists "/etc/group" "root:x:0:lt" "lt should not have root access" "4"
 
 
 # keep this line at the end, input the path to score report html here
