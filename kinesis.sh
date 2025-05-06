@@ -83,6 +83,39 @@ check_text_exists3() {
         _append_unsolved
     fi
 }
+check_text_with_threshold() {
+  local file="$1"
+  local text_prefix="$2"  
+  local threshold="$3"    # The maximum or minimum allowed value
+  local vuln_name="$4"
+  local points="$5"
+  local compare="$6"      # "<" or ">"
+
+  grep -oP "^${text_prefix}(\d+)" "$file" | while IFS= read -r match; do
+    local value="${match#"$text_prefix"}"
+
+    if [[ "$compare" == "<" ]]; then
+      if (( value <= threshold )); then
+        echo "Vulnerability fixed: '$vuln_name'"
+        _append_found "$vuln_name" "$points"
+      else
+        echo "Unsolved Vuln"
+        _append_unsolved
+      fi
+    elif [[ "$compare" == ">" ]]; then
+      if (( value >= threshold )); then
+        echo "Vulnerability fixed: '$vuln_name'"
+        _append_found "$vuln_name" "$points"
+      else
+        echo "Unsolved Vuln"
+        _append_unsolved
+      fi
+    else
+      echo "Invalid comparison operator: '$compare'"
+      return 1
+    fi
+  done
+}
 
 # Function to check if text does not exist in a file
 check_text_not_exists() {
@@ -258,6 +291,8 @@ check_packages3() {
 # accepts two args: image name, and injects bool (true/false)
 _header "Class of 25" "false"
 
+check_text_exists "/home/dallas/Desktop/Forensics1.txt" "iot-city" "Forensics 1 correct" "4"
+check_text_exists "/home/dallas/Desktop/Forensics2.txt" "https://tophermitchell.hair" "Forensics 2 correct" "4"
 check_text_not_exists "/etc/group" "koco:x:1010:" "Unauthorized user koco removed" "4"
 check_text_not_exists "/etc/group" "lt:x:1011:koco," "koco is not part of the LT group" "4"
 check_text_exists "/etc/ssh/sshd_config" "Port 22" "SSH runs on port 22" "4"
@@ -265,6 +300,23 @@ check_text_exists "/etc/ssh/sshd_config" "AddressFamily inet" "SSH connections o
 check_text_exists "/etc/ssh/sshd_config" "PermitRootLogin no" "SSH doesn't permit root login" "4"
 check_text_exists2 "/etc/ssh/sshd_config" "PasswordAuthentication no" "PubkeyAuthentication yes" "SSH uses key based authentication" "4"
 check_text_exists "/etc/ssh/sshd_config" "AuthorizedKeysCommandUser nobody" "No Authorized Key Command User" "4"
+check_text_exists2 "/etc/samba/smb.conf" "obey pam restrictions = yes" "pam password change = yes" "Samba obeys PAM restrictions" "4"
+check_text_exists "/etc/samba/smb.conf" "usershare allow guests = yes" "Samba user with usershare privileges cannot create public shares" "4"
+check_text_exists "/etc/samba/smb.conf" "unix password sync = yes" "Samba syncs unix pass with samba pass" "4"
+check_text_with_threshold "/etc/samba/smb.conf" "max log size = " "500" "Samba syncs unix pass with samba pass" "4" ">"
+check_text_exists2 "/etc/apt/apt.conf.d/20auto-upgrades" 'APT::Periodic::Update-Package-Lists "1";' 'APT::Periodic::Unattended-Upgrade "1"' "System set to automatically update" "4"
+check_text_exists "/etc/login.defs" "PASS_MAX_DAYS[[:space:]]*90" "Password must be changed after 90 days" "4"
+check_text_exists "/etc/login.defs" "LOGIN_RETRIES[[:space:]]*5" "Not oto many login retries" "4"
+check_text_exists3 "/etc/pam.d/common-password" "lcredit=-1" "ucredit=-1" "dcredit=-1" "login complexity enabled" "4"
+check_text_exists "/etc/pam.d/common-password" "minlen=16" "minimum password length set" "4"
+check_text_exists "/etc/gdm3/daemon.conf" "AutomaticLoginEnable = false" "Automatic login off" "4"
+check_packages "nmap" "nmap removed" "4"
+check_packages "nginx" "nginx removed" "4"
+check_packages "hydra" "hydra removed" "4"
+check_file_permissions "/etc/shadow" "600" "shadow file permissions fixed" "4"
+check_text_not_exists "/var/spool/cron/crontabs/spencer" "* * * * * apt install hydra" "malicious crontab removed" "4"
+check_text_not_exists "/etc/group" "root:x:0:lt" "lt should not have root access" "4"
+
 
 # keep this line at the end, input the path to score report html here
 # accepts two args: path to template html file, and path to actual html file
